@@ -11,11 +11,9 @@ public class GhostController : MonoBehaviour
 
     [SerializeField] private Rigidbody2D rb; // the rigidbody of the ghost
 
-    [SerializeField] private MovementChange[] movementBuffer; // the movements the ghost has to do
+    [SerializeField] private Vector2[] movementBuffer; // the movements the ghost has to do
 
     private int currentMovementIndex; // this will track what index of the movement buffer we are on
-
-    private bool hasMovementBuffer = false; // this indicated wheather this ghost has the movement buffer or not
 
     public float timeSinceSpawn; // this stores the time since this ghost spawned
 
@@ -23,32 +21,20 @@ public class GhostController : MonoBehaviour
         movementSpeed = speed;
     }
 
-    public void SetMovementBuffer(List<MovementChange> movementChanges) { // this will provide the ghost with all of the movements it has to do
+    public void SetMovementBuffer(List<Vector2> movementChanges) { // this will provide the ghost with all of the movements it has to do
         movementBuffer = movementChanges.ToArray();  // turn the movements to an array and set it to the buffer
-        hasMovementBuffer = true; // we now have the movement buffer
     }
 
     void FixedUpdate()
     {
+        if(currentMovementIndex >= movementBuffer.Length) { // if the current movement index is more than lenght of the movement buffer
+            movement = Vector2.zero; // we set the movement to zero so the ghost can stop moving
+        } else { // if not
+            movement = movementBuffer[currentMovementIndex]; // set the movement to the current movement buffer thing 
+        }
+
         rb.MovePosition(rb.position + movement * movementSpeed * Time.fixedDeltaTime); // move the ghost
-    }
-
-    void Update()
-    {
-        timeSinceSpawn += Time.deltaTime; // update the timer
-
-        if(currentMovementIndex >= movementBuffer.Length || hasMovementBuffer == false) { // if we are at the last movement change or we dont have the movement buffer
-            movement = Vector2.zero; // we stop the ghost from moving
-            return; // make the ghost do nothing else
-        }
-
-        MovementChange nextMovementChange = movementBuffer[currentMovementIndex + 1]; // get the next movement change
-
-        if(timeSinceSpawn >= nextMovementChange.GetTimeOfChange()) { // if the current time is greater than or equal to the next movement changes time
-            currentMovementIndex += 1; // the current movement change is the next movement change
-        }
-        
-        movement = movementBuffer[currentMovementIndex].GetNewMovement(); // set the movement vector to the current movement change
+        currentMovementIndex++; // increment the movement buffer index
     }
 
     public void ResetGhost() {

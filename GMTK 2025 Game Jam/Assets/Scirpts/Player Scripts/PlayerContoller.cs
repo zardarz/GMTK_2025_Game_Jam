@@ -17,7 +17,7 @@ public class PlayerContoller : MonoBehaviour
 
     private Vector2 previousMovement; // this store the movement vector of the last frame
 
-    [SerializeField] private List<MovementChange> movementBuffer; // this will store all of the movements the player made
+    [SerializeField] private List<Vector2> movementBuffer; // this will store all of the movements the player made
 
     private float timeSinceLastSpawn; // this is the time since the last ghost was spawned
 
@@ -37,15 +37,12 @@ public class PlayerContoller : MonoBehaviour
     }
 
     private void TrackMovements() {
-        if(movement != previousMovement) { // if the last frames movement is different than this frame
-            MovementChange newMovementChange = new MovementChange(movement, timeSinceLastSpawn); // make a new movement change that has the current movement vector and the time since last ghost spawn
-
-            movementBuffer.Add(newMovementChange); // add it to the buffer
-        }
+        
     }
 
     void FixedUpdate()
     {
+        movementBuffer.Add(movement);
         rb.MovePosition(rb.position + movement * movementSpeed * Time.fixedDeltaTime); // move the player
         previousMovement = movement; // the last movement was this movement
     }
